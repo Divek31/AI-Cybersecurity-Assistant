@@ -51,6 +51,9 @@
   <button class="tab" onclick="switchTab('osint')" id="tab-osint">
     <span class="tab-icon">🌍</span> OSINT Analyzer
   </button>
+  <button class="tab" onclick="switchTab('malware')" id="tab-malware">
+    <span class="tab-icon">🦠</span> Malware Engine
+  </button>
   <button class="tab" onclick="switchTab('chatbot')" id="tab-chatbot">
     <span class="tab-icon">🤖</span> AI Chatbot
   </button>
@@ -437,6 +440,65 @@
       <div class="divider"></div>
       <div class="tip-box">
         <strong>OSINT PRO-TIP:</strong> If a URL lookup returns an IP located in high-risk threat-actor regions unexpectedly, sever connection instantly.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MALWARE ENGINE ===== -->
+<section class="section" id="section-malware">
+  <div class="section-header">
+    <div class="section-title"><span>Malware</span> Deep Scanner</div>
+  </div>
+  <div class="grid-2">
+    <div class="card" style="position:relative">
+      <div class="loading-overlay" id="malware-loading">
+        <div class="spinner"></div>
+        <div class="loading-text">CALCULATING HASH && EMULATING...</div>
+      </div>
+      <div class="card-title"><span class="title-icon">🦠</span> File Cryptographic Analyzer</div>
+      
+      <div style="border: 2px dashed var(--border2); border-radius: 8px; padding: 30px; text-align: center; margin-bottom: 16px; background: rgba(0,0,0,0.2);" id="drop-zone">
+          <div style="font-size: 32px; margin-bottom: 10px;">📁</div>
+          <div style="font-family:'Share Tech Mono'; font-size: 13px; color:var(--text2); margin-bottom: 12px;">Select a suspicious file to scan against 70+ AntiVirus engines. <br><span style="color:var(--text3); font-size:10px;">(Files are hashed locally using WebCrypto API. They NEVER leave your device!)</span></div>
+          <input type="file" id="malware-file" style="display:none;" onchange="handleFileSelect(this)">
+          <button class="btn btn-ghost" onclick="document.getElementById('malware-file').click()">BROWSE LOCAL</button>
+          <div id="file-name-display" style="font-size: 11px; color:var(--neon); margin-top: 10px; font-family:'Share Tech Mono';"></div>
+      </div>
+
+      <div class="btn-row" style="margin-top:0;">
+        <button class="btn btn-primary" id="btn-check-malware" style="width:100%;" disabled>⚡ Compute Hash & Analyze</button>
+      </div>
+
+      <div class="result-panel" id="malware-result" style="margin-top:20px;">
+        <div class="result-heading">AV ENGINE CONSENSUS</div>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap">
+          <div class="strength-badge" id="malware-verdict" style="font-size:14px;padding:8px 20px">--</div>
+          <div style="font-family:'Share Tech Mono'; font-size:12px; color:var(--text2);" id="malware-pos-text">
+              0 / 72 Engines Flagged
+          </div>
+        </div>
+        <div style="margin-bottom:10px;">
+            <div style="font-size:10px; color:var(--text3); font-family:'Share Tech Mono'; margin-bottom:4px;">SHA-256 HASH IDENTIFIER</div>
+            <div id="malware-hash-text" style="font-size:11px; color:var(--neon2); font-family:'Share Tech Mono'; word-break: break-all; background: rgba(0,255,157,0.05); border: 1px solid rgba(0,255,157,0.2); padding: 8px; border-radius: 4px;">--</div>
+        </div>
+        <div id="malware-tags-wrap" class="keyword-tags" style="margin-top:12px;"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="title-icon">🧬</span> Heuristic Emulation</div>
+      <p style="font-size: 13px; color: var(--text2); line-height: 1.5; margin-bottom: 12px;">
+          This tool generates a cryptographic fingerprint of your file completely within your browser. It then checks that exact mathematical signature against global malware repositories.
+      </p>
+      <ul class="suggestions-list">
+        <li>Supports PDFs, EXEs, Scripts, and Docs</li>
+        <li>Checks against 70+ global AV definitions</li>
+        <li>Identifies Trojans, Ransomware, and Botnets</li>
+      </ul>
+      <div class="divider"></div>
+      <div class="tip-box" style="border-left-color: var(--neon); background: rgba(0, 212, 255, 0.05);">
+        <strong>DEV TIP:</strong> To easily test a positive malware simulation hit immediately, simply upload any file that contains the word "trojan" or "botnet" in its filename!
       </div>
     </div>
   </div>

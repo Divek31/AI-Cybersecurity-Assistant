@@ -6,6 +6,7 @@ from backend.ai_models import analyze_password, analyze_url, analyze_email, get_
 from backend.news_feed import get_latest_news
 from backend.breach_scanner import check_email_breach
 from backend.osint_scanner import analyze_ip_domain
+from backend.malware_scanner import analyze_file_hash
 from backend.models import db, User, ScanHistory
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -144,6 +145,30 @@ def perform_osint():
     
     # Log to DB
     history = ScanHistory(user_id=current_user.id, scan_type='osint', scan_input=query[:255], scan_result=scan_result_str, risk_score=score)
+    db.session.add(history)
+    db.session.commit()
+    
+    return jsonify(result)
+
+@app.route('/api/scan-hash', methods=['POST'])
+@login_required
+def scan_malware_hash():
+    data = request.json
+    file_hash = data.get('hash', '')
+    file_name = data.get('name', 'unknown')
+    
+    result = analyze_file_hash(file_hash, file_name)
+    
+    # Calculate Risk Score based on AV Positives vs Total
+    try:
+        score = int((result['positives'] / result['total']) * 100)
+    except:
+        score = 0
+        
+    scan_result_str = result.get('category', 'Clean').upper()
+    
+    # Log to DB
+    history = ScanHistory(user_id=current_user.id, scan_type='file', scan_input=file_name[:255], scan_result=scan_result_str[:50], risk_score=score)
     db.session.add(history)
     db.session.commit()
     

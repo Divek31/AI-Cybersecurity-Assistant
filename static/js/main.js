@@ -320,6 +320,68 @@ document.getElementById('btn-check-osint').addEventListener('click', async () =>
     }
 });
 
+// ======= MALWARE SCANNER =======
+let selectedMalwareFile = null;
+
+window.handleFileSelect = function(input) {
+    if (input.files && input.files[0]) {
+        selectedMalwareFile = input.files[0];
+        document.getElementById('file-name-display').textContent = `SELECTED: ${selectedMalwareFile.name} (${(selectedMalwareFile.size / 1024).toFixed(1)} KB)`;
+        document.getElementById('btn-check-malware').disabled = false;
+        hideResult('malware-result');
+    }
+};
+
+document.getElementById('btn-check-malware').addEventListener('click', async () => {
+    if (!selectedMalwareFile) return;
+
+    showLoading('malware-loading');
+    try {
+        // Compute SHA-256 purely in Chrome/Browser WebCrypto securely
+        const arrayBuffer = await selectedMalwareFile.arrayBuffer();
+        const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        
+        const data = await fetchMalwareScan(hashHex, selectedMalwareFile.name); // Send ONLY the hash string
+        
+        await reloadHistoryData();
+        renderMalwareResult(data);
+        
+        if (data.positives > 0) toast(`⚠️ Malware Detected! Flagged by ${data.positives} engines.`, 'danger', 5000);
+        else toast('Clean! File appears safe.', 'success', 3000);
+        
+    } catch (e) {
+        toast('Error processing file hash.', 'danger');
+    } finally {
+        hideLoading('malware-loading');
+    }
+});
+
+function renderMalwareResult(data) {
+  const badge = document.getElementById('malware-verdict');
+  const posText = document.getElementById('malware-pos-text');
+  const hashText = document.getElementById('malware-hash-text');
+  const wrap = document.getElementById('malware-tags-wrap');
+  
+  hashText.textContent = data.hash;
+  posText.textContent = `${data.positives} / ${data.total} Engines Flagged`;
+  
+  if (data.positives > 0) {
+      badge.className = 'strength-badge badge-danger';
+      badge.textContent = `🚨 ${data.category.toUpperCase()}`;
+      posText.style.color = 'var(--neon3)';
+      wrap.innerHTML = data.details.map(t => `<span class="keyword-tag danger">🔴 ${t}</span>`).join('');
+  } else {
+      badge.className = 'strength-badge badge-safe';
+      badge.textContent = '✅ CLEAN';
+      posText.style.color = 'var(--neon2)';
+      wrap.innerHTML = '<div style="font-size:11px; font-family:\'Share Tech Mono\'; color:var(--text3);">No malicious signatures identified matching this cryptographic baseline.</div>';
+  }
+  
+  showResult('malware-result');
+}
+
 // ======= EMAIL ANALYZER =======
 document.getElementById('btn-check-email').addEventListener('click', async () => {
   const text = document.getElementById('email-input').value.trim();

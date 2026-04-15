@@ -82,6 +82,16 @@ async function fetchOsint(query) {
     return await response.json();
 }
 
+async function fetchMalwareScan(hash_str, name) {
+    const response = await fetch(`${API_BASE}/scan-hash`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hash: hash_str, name: name })
+    });
+    if (!response.ok) throw new Error('API Request Failed');
+    return await response.json();
+}
+
 /**
  * Fetches latest security news.
  * @returns {Promise<Object>}

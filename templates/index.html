@@ -45,6 +45,9 @@
   <button class="tab" onclick="switchTab('email')" id="tab-email">
     <span class="tab-icon">📧</span> Email Analyzer
   </button>
+  <button class="tab" onclick="switchTab('breach')" id="tab-breach">
+    <span class="tab-icon">🕵️</span> Breach Scanner
+  </button>
   <button class="tab" onclick="switchTab('chatbot')" id="tab-chatbot">
     <span class="tab-icon">🤖</span> AI Chatbot
   </button>
@@ -314,6 +317,57 @@
         <div style="display:flex;align-items:center;gap:10px;font-size:13px">
           <span class="badge badge-danger">DANGEROUS</span><span style="color:var(--text2)">Score 61–100 — Do NOT visit</span>
         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BREACH SCANNER ===== -->
+<section class="section" id="section-breach">
+  <div class="section-header">
+    <div class="section-title"><span>Deep Web</span> Breach Scanner</div>
+  </div>
+  <div class="grid-2">
+    <div class="card" style="position:relative">
+      <div class="loading-overlay" id="breach-loading">
+        <div class="spinner"></div>
+        <div class="loading-text">SCANNING DATABASES...</div>
+      </div>
+      <div class="card-title"><span class="title-icon">🕵️</span> Compromise Check</div>
+      <div class="input-group">
+        <label class="input-label">Target Email Address</label>
+        <input class="cyber-input" id="breach-input" placeholder="e.g. your.email@example.com" type="email">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-check-breach">🔍 Run Scan</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('breach-input').value='';hideResult('breach-result')">✕ Clear</button>
+      </div>
+
+      <div class="result-panel" id="breach-result" style="margin-top:20px;">
+        <div class="result-heading">INTELLIGENCE REPORT</div>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap">
+          <div class="strength-badge" id="breach-verdict" style="font-size:14px;padding:8px 20px">--</div>
+          <div style="font-family:'Share Tech Mono'; font-size:12px; color:var(--text2);" id="breach-count-text">
+              0 Hits Discovered
+          </div>
+        </div>
+        <div id="breach-hits-wrap" style="max-height:300px; overflow-y:auto; padding-right:10px;"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="title-icon">🌐</span> Global Threat Index</div>
+      <p style="font-size: 13px; color: var(--text2); line-height: 1.5; margin-bottom: 12px;">
+          This tool securely checks your email against known massive data dumps retrieved from the deep web and underground forums. 
+      </p>
+      <ul class="suggestions-list">
+        <li>Indexes major corporate leaks (LinkedIn, Adobe, MyFitnessPal)</li>
+        <li>Searches botnet compilation lists (Collection #1)</li>
+        <li>Checks for plaintext password exposures</li>
+      </ul>
+      <div class="divider"></div>
+      <div class="tip-box" style="border-left-color: var(--neon3); background: rgba(255, 62, 108, 0.05);">
+        <strong>WARNING:</strong> If your email appears in a breach, immediately change the password for that specific service, and ANY OTHER service where you blindly reused that exact same password.
       </div>
     </div>
   </div>

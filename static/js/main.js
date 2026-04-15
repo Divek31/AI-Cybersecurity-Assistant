@@ -224,6 +224,72 @@ function renderURLResult(url, score, verdict, reasonsList) {
   showResult('url-result');
 }
 
+// ======= BREACH SCANNER =======
+document.getElementById('btn-check-breach').addEventListener('click', async () => {
+    const raw = document.getElementById('breach-input').value.trim();
+    if(!raw || !raw.includes('@')) { toast('Please enter a valid email address', 'warning'); return; }
+
+    showLoading('breach-loading');
+    try {
+        const data = await fetchBreach(raw); // From api.js
+        renderBreachResult(data);
+        await reloadHistoryData(); 
+        
+        if(data.breached) toast(`⚠️ Critical: Email found in ${data.breach_count} known data breaches!`, 'danger', 5000);
+        else toast('Clean! No known breaches found for this email.', 'success', 3000);
+    } catch (e) {
+        toast('Error interacting with Breach Database.', 'danger');
+    } finally {
+        hideLoading('breach-loading');
+    }
+});
+
+function renderBreachResult(data) {
+  const badge = document.getElementById('breach-verdict');
+  const countText = document.getElementById('breach-count-text');
+  const wrap = document.getElementById('breach-hits-wrap');
+  
+  if (data.breached) {
+      badge.className = 'strength-badge badge-danger';
+      badge.textContent = '🚨 COMPROMISED';
+      countText.textContent = `${data.breach_count} Leaks Detected`;
+      countText.style.color = 'var(--neon3)';
+      
+      let html = '';
+      data.breaches.forEach(b => {
+          html += `
+          <div style="background: rgba(255, 62, 108, 0.05); border: 1px solid rgba(255, 62, 108, 0.2); border-radius: 6px; padding: 12px; margin-bottom: 12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+                  <span style="font-family:'Rajdhani', sans-serif; font-size:15px; font-weight:700; color:var(--text);">${b.name}</span>
+                  <span style="font-family:'Share Tech Mono'; font-size:10px; color:var(--neon3);">${b.date}</span>
+              </div>
+              <div style="font-size:12px; font-family:'Share Tech Mono'; color:var(--text2); margin-bottom:8px; line-height:1.4;">
+                  ${b.description}
+              </div>
+              <div style="font-size:11px; font-family:'Share Tech Mono'; color:var(--text3);">
+                  <span style="color:var(--text);">Lost Data:</span> ${b.compromised_data.join(', ')}
+              </div>
+          </div>
+          `;
+      });
+      wrap.innerHTML = html;
+      
+  } else {
+      badge.className = 'strength-badge badge-safe';
+      badge.textContent = '✅ SECURE';
+      countText.textContent = '0 Leaks Detected';
+      countText.style.color = 'var(--neon2)';
+      wrap.innerHTML = `
+        <div style="text-align:center; padding: 30px; border: 1px solid var(--border2); border-radius: 6px; background: var(--bg);">
+            <div style="font-size: 30px; margin-bottom: 10px;">🛡️</div>
+            <div style="font-family:'Share Tech Mono'; font-size: 14px; color:var(--neon2);">NO PUBLIC BREACHES FOUND</div>
+            <div style="font-size: 11px; color:var(--text3); margin-top: 6px;">This email hasn't appeared in our database of deep web credential dumps.</div>
+        </div>
+      `;
+  }
+  showResult('breach-result');
+}
+
 // ======= EMAIL ANALYZER =======
 document.getElementById('btn-check-email').addEventListener('click', async () => {
   const text = document.getElementById('email-input').value.trim();

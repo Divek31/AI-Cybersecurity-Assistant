@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from backend.ai_models import analyze_password, analyze_url, analyze_email, get_chat_response
 from backend.news_feed import get_latest_news
+from backend.breach_scanner import check_email_breach
 from backend.models import db, User, ScanHistory
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -111,6 +112,24 @@ def chat():
     query = data.get('query', '')
     response = get_chat_response(query)
     return jsonify({'response': response})
+
+@app.route('/api/check-breach', methods=['POST'])
+@login_required
+def check_breach():
+    data = request.json
+    email = data.get('email', '')
+    result = check_email_breach(email)
+    
+    # Force score mapping for database history logic
+    score = 100 if result['breached'] else 0
+    scan_result_str = "BREACH FOUND" if result['breached'] else "SAFE"
+    
+    # Log to DB
+    history = ScanHistory(user_id=current_user.id, scan_type='breach', scan_input=email[:255], scan_result=scan_result_str, risk_score=score)
+    db.session.add(history)
+    db.session.commit()
+    
+    return jsonify(result)
 
 @app.route('/api/news', methods=['GET'])
 @login_required

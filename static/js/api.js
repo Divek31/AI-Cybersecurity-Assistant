@@ -62,6 +62,16 @@ async function sendQuery(query) {
     return await response.json();
 }
 
+async function fetchBreach(email) {
+    const response = await fetch(`${API_BASE}/check-breach`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    });
+    if (!response.ok) throw new Error('API Request Failed');
+    return await response.json();
+}
+
 /**
  * Fetches latest security news.
  * @returns {Promise<Object>}

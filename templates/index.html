@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberShield AI — Security Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<!-- Custom CSS from Flask -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div id="toast-container"></div>
+
+<div class="wrapper">
+<header>
+  <div class="logo">
+    <div class="logo-icon">🛡</div>
+    <div>
+      <div class="logo-text">Cyber<span>Shield</span> AI</div>
+      <div class="logo-sub">SECURITY INTELLIGENCE PLATFORM</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-badge"><div class="status-dot"></div>SYSTEMS ONLINE</div>
+    <div class="time-display">
+      <div id="clock">--:--:--</div>
+      <div style="font-size:10px;color:var(--text3)" id="datedisp">---</div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <button class="tab active" onclick="switchTab('dashboard')" id="tab-dashboard">
+    <span class="tab-icon">📊</span> Dashboard
+  </button>
+  <button class="tab" onclick="switchTab('password')" id="tab-password">
+    <span class="tab-icon">🔐</span> Password
+  </button>
+  <button class="tab" onclick="switchTab('url')" id="tab-url">
+    <span class="tab-icon">🎣</span> URL Scanner
+  </button>
+  <button class="tab" onclick="switchTab('email')" id="tab-email">
+    <span class="tab-icon">📧</span> Email Analyzer
+  </button>
+  <button class="tab" onclick="switchTab('chatbot')" id="tab-chatbot">
+    <span class="tab-icon">🤖</span> AI Chatbot
+  </button>
+  <button class="tab" onclick="switchTab('history')" id="tab-history">
+    <span class="tab-icon">📁</span> History
+  </button>
+</nav>
+
+<main>
+
+<!-- ===== DASHBOARD ===== -->
+<section class="section active" id="section-dashboard">
+  <div class="section-header">
+    <div class="section-title"><span>Security</span> Dashboard</div>
+    <button class="export-btn" onclick="exportReport()">⬇ Export Report</button>
+  </div>
+  <div class="dash-grid">
+    <div class="stat-card blue">
+      <div class="stat-icon">🔍</div>
+      <div class="stat-value" id="stat-total">0</div>
+      <div class="stat-name">Total Scans</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-value" id="stat-threats">0</div>
+      <div class="stat-name">Threats Found</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value" id="stat-safe">0</div>
+      <div class="stat-name">Safe Results</div>
+    </div>
+    <div class="stat-card yellow">
+      <div class="stat-icon">🔐</div>
+      <div class="stat-value" id="stat-pwchecks">0</div>
+      <div class="stat-name">Passwords Checked</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="title-icon">📈</span> Scan Activity (Last 7 Items)</div>
+      <div class="chart-wrap">
+        <div class="chart-title">SCAN HISTORY — TYPE DISTRIBUTION</div>
+        <svg class="bar-chart-svg" id="bar-chart" viewBox="0 0 400 160" preserveAspectRatio="none">
+          <text x="200" y="80" fill="rgba(0,212,255,0.2)" font-family="Share Tech Mono" font-size="11" text-anchor="middle">NO DATA YET</text>
+        </svg>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="title-icon">🥧</span> Threat Breakdown</div>
+      <div class="chart-wrap" style="display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:140px;">
+        <svg id="pie-chart" width="140" height="140" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="55" fill="none" stroke="var(--bg)" stroke-width="20"/>
+          <text x="70" y="75" fill="rgba(0,212,255,0.2)" font-family="Share Tech Mono" font-size="10" text-anchor="middle">NO DATA</text>
+        </svg>
+        <div id="pie-legend" style="display:flex;gap:16px;margin-top:10px;font-size:11px;font-family:'Share Tech Mono';color:var(--text2)"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title"><span class="title-icon">🔔</span> Recent Alerts</div>
+    <div id="recent-alerts">
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        NO ALERTS YET — START SCANNING TO SEE RESULTS
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PASSWORD ===== -->
+<section class="section" id="section-password">
+  <div class="section-header">
+    <div class="section-title"><span>Password</span> Strength Analyzer</div>
+  </div>
+  <div class="grid-2">
+    <div class="card" style="position:relative">
+      <div class="loading-overlay" id="pw-loading">
+        <div class="spinner"></div>
+        <div class="loading-text">ANALYZING...</div>
+      </div>
+      <div class="card-title"><span class="title-icon">🔐</span> Analyze Password</div>
+      <div class="input-group">
+        <label class="input-label">Enter Password</label>
+        <div class="input-row">
+          <input class="cyber-input" type="password" id="pw-input" placeholder="Enter your password...">
+          <button class="btn btn-ghost btn-sm" onclick="togglePwVisibility()" title="Show/Hide" style="min-width:44px">👁</button>
+        </div>
+      </div>
+
+      <div class="strength-bar-wrap">
+        <div class="strength-labels">
+          <span>WEAK</span><span>MEDIUM</span><span>STRONG</span>
+        </div>
+        <div class="strength-bar-bg">
+          <div class="strength-bar-fill" id="pw-bar"></div>
+        </div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:12px">
+          <span class="strength-badge" id="pw-badge" style="background:rgba(58,90,120,0.2);color:var(--text3);border:1px solid var(--text3)">NOT ANALYZED</span>
+          <span id="pw-score-text" style="font-family:'Share Tech Mono';font-size:11px;color:var(--text3)"></span>
+        </div>
+      </div>
+
+      <div class="criteria-grid">
+        <div class="criteria-item" id="cr-len"><span class="criteria-icon">📏</span> Min 8 Characters</div>
+        <div class="criteria-item" id="cr-upper"><span class="criteria-icon">🔠</span> Uppercase Letter</div>
+        <div class="criteria-item" id="cr-lower"><span class="criteria-icon">🔡</span> Lowercase Letter</div>
+        <div class="criteria-item" id="cr-num"><span class="criteria-icon">🔢</span> Number</div>
+        <div class="criteria-item" id="cr-special"><span class="criteria-icon">✳️</span> Special Character</div>
+        <div class="criteria-item" id="cr-long"><span class="criteria-icon">📐</span> 12+ Characters</div>
+      </div>
+      
+      <!-- New Check Button to call Flask API manually instead of entirely on input -->
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-check-pass">⚡ Analyze with AI</button>
+      </div>
+
+      <div class="divider"></div>
+      <div class="card-title" style="font-size:11px"><span class="title-icon">⚙️</span> Generate Strong Password</div>
+      <div class="pass-gen-row">
+        <div class="pass-gen-output" id="gen-pw-output">Click Generate →</div>
+        <button class="btn btn-success btn-sm" onclick="generatePassword()">Generate</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyGenerated()" title="Copy">📋</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="title-icon">💡</span> Improvement Tips</div>
+      <div id="pw-suggestions">
+        <div class="empty-state" style="padding:20px">
+          <div class="empty-icon">🔐</div>
+          START TYPING A PASSWORD TO SEE ANALYSIS
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="card-title" style="font-size:11px"><span class="title-icon">📖</span> Password Best Practices</div>
+      <div class="tip-box">
+        <strong>PRO TIP:</strong> Use a passphrase like <code style="color:var(--neon2)">Purple$Lion42Jumps!</code> — long, memorable, and strong.
+      </div>
+      <ul class="suggestions-list" style="margin-top:12px">
+        <li>Never reuse passwords across different sites</li>
+        <li>Use a password manager (Bitwarden, 1Password)</li>
+        <li>Enable 2FA on all important accounts</li>
+        <li>Change passwords after any data breach</li>
+        <li>Avoid personal info (birthdays, names)</li>
+        <li>Minimum 16 characters for critical accounts</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== URL SCANNER ===== -->
+<section class="section" id="section-url">
+  <div class="section-header">
+    <div class="section-title"><span>Phishing</span> URL Detector</div>
+  </div>
+  <div class="grid-2">
+    <div class="card" style="position:relative">
+      <div class="loading-overlay" id="url-loading">
+        <div class="spinner"></div>
+        <div class="loading-text">SCANNING URL...</div>
+      </div>
+      <div class="card-title"><span class="title-icon">🎣</span> URL Scanner</div>
+      <div class="input-group">
+        <label class="input-label">Enter URL to Scan</label>
+        <input class="cyber-input" id="url-input" placeholder="https://example.com or http://suspicious-site.xyz/login" type="text">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-check-url">⚡ Scan URL</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('url-input').value='';hideResult('url-result')">✕ Clear</button>
+      </div>
+
+      <div class="result-panel" id="url-result">
+        <div class="result-heading">ANALYSIS RESULT</div>
+        <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap">
+          <div class="risk-meter">
+            <div class="risk-circle">
+              <svg viewBox="0 0 160 160">
+                <circle class="bg" cx="80" cy="80" r="70"/>
+                <circle id="risk-ring" cx="80" cy="80" r="70"/>
+              </svg>
+              <div class="risk-score-text">
+                <div class="risk-num" id="risk-num">--</div>
+                <div class="risk-label-sm">RISK SCORE</div>
+              </div>
+            </div>
+            <div class="strength-badge" id="url-verdict">--</div>
+          </div>
+          <div style="flex:1;min-width:200px">
+            <div class="check-list" id="url-checks"></div>
+          </div>
+        </div>
+        <div id="url-breakdown-wrap"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="title-icon">📋</span> Detection Criteria</div>
+      <ul class="suggestions-list">
+        <li>HTTPS protocol check</li>
+        <li>URL length analysis (long URLs are suspicious)</li>
+        <li>Presence of @ symbol (used to deceive)</li>
+        <li>Excessive hyphens in domain</li>
+        <li>Suspicious TLD patterns (.xyz, .tk, .ml)</li>
+        <li>IP address instead of domain name</li>
+        <li>Multiple subdomains stacked</li>
+        <li>Known phishing keyword patterns</li>
+      </ul>
+      <div class="divider"></div>
+      <div class="card-title" style="font-size:11px"><span class="title-icon">🌡</span> Risk Scale</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+          <span class="badge badge-safe">SAFE</span><span style="color:var(--text2)">Score 0–30 — Likely legitimate</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+          <span class="badge badge-warn">SUSPICIOUS</span><span style="color:var(--text2)">Score 31–60 — Proceed with caution</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+          <span class="badge badge-danger">DANGEROUS</span><span style="color:var(--text2)">Score 61–100 — Do NOT visit</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== EMAIL ===== -->
+<section class="section" id="section-email">
+  <div class="section-header">
+    <div class="section-title"><span>Email</span> Scam Classifier</div>
+  </div>
+  <div class="grid-2">
+    <div class="card" style="position:relative">
+      <div class="loading-overlay" id="email-loading">
+        <div class="spinner"></div>
+        <div class="loading-text">ANALYZING EMAIL...</div>
+      </div>
+      <div class="card-title"><span class="title-icon">📧</span> Email Text Analyzer</div>
+      <div class="input-group">
+        <label class="input-label">Paste Email Content</label>
+        <textarea class="cyber-input" id="email-input" placeholder="Paste the suspicious email content here...&#10;&#10;e.g. Dear customer, you have won $1,000,000. Click here to claim your prize urgently..." style="min-height:150px"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-check-email">🔍 Analyze Email</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('email-input').value='';hideResult('email-result')">✕ Clear</button>
+      </div>
+
+      <div class="result-panel" id="email-result">
+        <div class="result-heading">CLASSIFICATION RESULT</div>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap">
+          <div class="strength-badge" id="email-verdict" style="font-size:14px;padding:8px 20px">--</div>
+          <div style="flex:1">
+            <div class="prob-bar-wrap" id="email-probs"></div>
+          </div>
+        </div>
+        <div class="result-heading" style="margin-top:12px">SUSPICIOUS KEYWORDS DETECTED</div>
+        <div class="keyword-tags" id="keyword-tags"></div>
+        <div id="email-highlighted-wrap"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="title-icon">🧠</span> Scam Indicators</div>
+      <ul class="suggestions-list">
+        <li>Urgency words: "urgent", "act now", "expires"</li>
+        <li>Prize/lottery claims: "winner", "reward", "prize"</li>
+        <li>Financial bait: "free money", "investment"</li>
+        <li>Credential phishing: "verify account", "login"</li>
+        <li>Threats: "suspended", "blocked", "arrested"</li>
+        <li>Too-good-to-be-true offers</li>
+        <li>Requests for personal/bank information</li>
+        <li>Suspicious sender domains</li>
+      </ul>
+      <div class="divider"></div>
+      <div class="tip-box">
+        <strong>REMEMBER:</strong> Legitimate companies never ask for passwords via email. When in doubt, contact the company directly through their official website.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CHATBOT ===== -->
+<section class="section" id="section-chatbot">
+  <div class="section-header">
+    <div class="section-title"><span>AI</span> Security Chatbot</div>
+    <div class="status-badge"><div class="status-dot"></div>LOCAL AI CONNECTED</div>
+  </div>
+  <div class="grid-2">
+    <div class="card" style="display:flex;flex-direction:column">
+      <div class="card-title"><span class="title-icon">🤖</span> CyberShield Assistant</div>
+      <div class="chat-container" id="chat-box"></div>
+      <div class="quick-chips">
+        <button class="chip" onclick="sendChip('How do I create a strong password?')">💡 Strong passwords</button>
+        <button class="chip" onclick="sendChip('What is phishing and how to avoid it?')">🎣 Phishing tips</button>
+        <button class="chip" onclick="sendChip('How to secure my online accounts?')">🔒 Account security</button>
+        <button class="chip" onclick="sendChip('What is two-factor authentication?')">📱 2FA explained</button>
+        <button class="chip" onclick="sendChip('How to detect malware on my device?')">🦠 Malware detection</button>
+      </div>
+      <div class="chat-input-row" style="margin-top:10px">
+        <input class="cyber-input" id="chat-input" placeholder="Ask me anything about cybersecurity..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn btn-primary" onclick="sendChat()" id="btn-send-chat">Send ▶</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="title-icon">📚</span> What I Can Help With</div>
+      <ul class="suggestions-list">
+        <li>Password security best practices</li>
+        <li>Identifying phishing emails and sites</li>
+        <li>Setting up two-factor authentication</li>
+        <li>VPN usage and privacy tips</li>
+        <li>Securing social media accounts</li>
+        <li>Understanding malware types</li>
+        <li>Safe online banking practices</li>
+        <li>Data breach response steps</li>
+        <li>Securing home WiFi networks</li>
+        <li>Safe browsing habits</li>
+      </ul>
+      <div class="divider"></div>
+      <div class="tip-box">
+        <strong>POWERED BY:</strong> Backend Logic — providing lightning-fast internal cybersecurity guidance.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HISTORY ===== -->
+<section class="section" id="section-history">
+  <div class="section-header">
+    <div class="section-title"><span>Scan</span> History</div>
+    <div style="display:flex;gap:8px">
+      <button class="export-btn" onclick="exportReport()">⬇ Export</button>
+      <button class="export-btn" onclick="clearHistory()" style="border-color:var(--neon3);color:var(--neon3)">🗑 Clear</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="title-icon">📁</span> All Scans</div>
+    <div id="history-content">
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        NO SCAN HISTORY YET
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<!-- API endpoints handler -->
+<script src="{{ url_for('static', filename='js/api.js') }}"></script>
+<!-- Logic driver linking UI to our internal AI Models in Python -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

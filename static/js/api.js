@@ -61,3 +61,13 @@ async function sendQuery(query) {
     if (!response.ok) throw new Error('API Request Failed');
     return await response.json();
 }
+
+/**
+ * Fetches latest security news.
+ * @returns {Promise<Object>}
+ */
+async function fetchNews() {
+    const response = await fetch(`${API_BASE}/news`);
+    if (!response.ok) throw new Error('API Request Failed');
+    return await response.json();
+}

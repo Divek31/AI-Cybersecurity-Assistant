@@ -576,4 +576,32 @@ ${'='.repeat(50)}
 };
 
 // ======= INIT =======
-document.addEventListener('DOMContentLoaded', updateDashboard);
+document.addEventListener('DOMContentLoaded', () => {
+    updateDashboard();
+    loadNewsFeed();
+});
+
+// ======= LIVE NEWS FEED =======
+async function loadNewsFeed() {
+    const container = document.getElementById('news-feed-content');
+    try {
+        const data = await fetchNews();
+        if (!data.news || data.news.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="empty-icon">📡</div>NO FEED DATA AVAILABLE</div>';
+            return;
+        }
+        
+        container.innerHTML = data.news.map(item => `
+            <a href="${item.link}" target="_blank" style="text-decoration:none; display:block; padding:10px 0; border-bottom:1px solid var(--border2); transition: background 0.2s;">
+                <div style="font-size:12px; color:var(--text); font-weight:600; line-height: 1.4; margin-bottom: 4px; font-family:'Rajdhani', sans-serif;">
+                    ${item.title}
+                </div>
+                <div style="font-size:10px; font-family:'Share Tech Mono'; color:var(--text3);">
+                    ${item.date.slice(0, 22)}
+                </div>
+            </a>
+        `).join('');
+    } catch (err) {
+        container.innerHTML = '<div class="empty-state" style="color:var(--neon3)"><div class="empty-icon">⚠️</div>ERROR LOADING FEED</div>';
+    }
+}

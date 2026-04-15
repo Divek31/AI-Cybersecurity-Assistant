@@ -119,13 +119,25 @@
     </div>
   </div>
 
-  <div class="card" style="margin-top:16px;">
-    <div class="card-title"><span class="title-icon">🔔</span> Recent Alerts</div>
-    <div id="recent-alerts">
-      <div class="empty-state">
-        <div class="empty-icon">📭</div>
-        NO ALERTS YET — START SCANNING TO SEE RESULTS
-      </div>
+  <div class="grid-2" style="margin-top:16px;">
+    <div class="card">
+        <div class="card-title"><span class="title-icon">🔔</span> Recent Alerts</div>
+        <div id="recent-alerts">
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                NO ALERTS YET — START SCANNING TO SEE RESULTS
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-title"><span class="title-icon">🗞️</span> Live Cybersecurity Feed</div>
+        <div id="news-feed-content">
+            <div class="loading-overlay show" id="news-loading" style="position:relative; height: 100px;">
+                <div class="spinner" style="width:24px; height:24px; border-width: 2px;"></div>
+                <div class="loading-text" style="font-size:10px;">FETCHING INTEL...</div>
+            </div>
+        </div>
     </div>
   </div>
 </section>

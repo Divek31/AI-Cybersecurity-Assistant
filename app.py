@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import os
 from backend.ai_models import analyze_password, analyze_url, analyze_email, get_chat_response
+from backend.news_feed import get_latest_news
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
@@ -35,6 +36,11 @@ def chat():
     query = data.get('query', '')
     response = get_chat_response(query)
     return jsonify({'response': response})
+
+@app.route('/api/news', methods=['GET'])
+def get_news():
+    news = get_latest_news()
+    return jsonify({'news': news})
 
 if __name__ == '__main__':
     # For local development

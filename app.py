@@ -5,6 +5,7 @@ import os
 from backend.ai_models import analyze_password, analyze_url, analyze_email, get_chat_response
 from backend.news_feed import get_latest_news
 from backend.breach_scanner import check_email_breach
+from backend.osint_scanner import analyze_ip_domain
 from backend.models import db, User, ScanHistory
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -126,6 +127,23 @@ def check_breach():
     
     # Log to DB
     history = ScanHistory(user_id=current_user.id, scan_type='breach', scan_input=email[:255], scan_result=scan_result_str, risk_score=score)
+    db.session.add(history)
+    db.session.commit()
+    
+    return jsonify(result)
+
+@app.route('/api/osint', methods=['POST'])
+@login_required
+def perform_osint():
+    data = request.json
+    query = data.get('query', '')
+    result = analyze_ip_domain(query)
+    
+    score = 0 if result['success'] else 50
+    scan_result_str = result.get('countryCode', 'ERR') if result['success'] else "FAILED"
+    
+    # Log to DB
+    history = ScanHistory(user_id=current_user.id, scan_type='osint', scan_input=query[:255], scan_result=scan_result_str, risk_score=score)
     db.session.add(history)
     db.session.commit()
     

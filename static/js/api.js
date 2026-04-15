@@ -72,6 +72,16 @@ async function fetchBreach(email) {
     return await response.json();
 }
 
+async function fetchOsint(query) {
+    const response = await fetch(`${API_BASE}/osint`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+    });
+    if (!response.ok) throw new Error('API Request Failed');
+    return await response.json();
+}
+
 /**
  * Fetches latest security news.
  * @returns {Promise<Object>}

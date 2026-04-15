@@ -290,6 +290,36 @@ function renderBreachResult(data) {
   showResult('breach-result');
 }
 
+// ======= OSINT ANALYZER =======
+document.getElementById('btn-check-osint').addEventListener('click', async () => {
+    const raw = document.getElementById('osint-input').value.trim();
+    if(!raw) { toast('Please enter a target IP or Domain', 'warning'); return; }
+
+    showLoading('osint-loading');
+    try {
+        const data = await fetchOsint(raw); // From api.js
+        await reloadHistoryData(); 
+        
+        if (data.success) {
+            document.getElementById('osint-res-ip').textContent = data.ip;
+            document.getElementById('osint-res-loc').textContent = `${data.city || 'Unknown'}, ${data.region || ''} ${data.country || ''} ${data.countryCode ? '['+data.countryCode+']' : ''}`;
+            document.getElementById('osint-res-isp').textContent = data.isp || data.org || 'Unknown Data Provider';
+            document.getElementById('osint-res-asn').textContent = data.asn || '--';
+            document.getElementById('osint-res-coords').textContent = `LAT: ${data.lat} | LON: ${data.lon}`;
+            
+            showResult('osint-result');
+            toast('Trace complete!', 'success', 2000);
+        } else {
+            toast(`Trace failed: ${data.error}`, 'danger');
+        }
+        
+    } catch (e) {
+        toast('Error interacting with OSINT module.', 'danger');
+    } finally {
+        hideLoading('osint-loading');
+    }
+});
+
 // ======= EMAIL ANALYZER =======
 document.getElementById('btn-check-email').addEventListener('click', async () => {
   const text = document.getElementById('email-input').value.trim();

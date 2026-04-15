@@ -48,6 +48,9 @@
   <button class="tab" onclick="switchTab('breach')" id="tab-breach">
     <span class="tab-icon">🕵️</span> Breach Scanner
   </button>
+  <button class="tab" onclick="switchTab('osint')" id="tab-osint">
+    <span class="tab-icon">🌍</span> OSINT Analyzer
+  </button>
   <button class="tab" onclick="switchTab('chatbot')" id="tab-chatbot">
     <span class="tab-icon">🤖</span> AI Chatbot
   </button>
@@ -368,6 +371,72 @@
       <div class="divider"></div>
       <div class="tip-box" style="border-left-color: var(--neon3); background: rgba(255, 62, 108, 0.05);">
         <strong>WARNING:</strong> If your email appears in a breach, immediately change the password for that specific service, and ANY OTHER service where you blindly reused that exact same password.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== OSINT ANALYZER ===== -->
+<section class="section" id="section-osint">
+  <div class="section-header">
+    <div class="section-title"><span>OSINT</span> Threat Analyzer</div>
+  </div>
+  <div class="grid-2">
+    <div class="card" style="position:relative">
+      <div class="loading-overlay" id="osint-loading">
+        <div class="spinner"></div>
+        <div class="loading-text">TRACING ROUTES...</div>
+      </div>
+      <div class="card-title"><span class="title-icon">🌍</span> IP / Domain Lookup</div>
+      <div class="input-group">
+        <label class="input-label">Target Network Node</label>
+        <input class="cyber-input" id="osint-input" placeholder="e.g. 192.168.1.1 or suspicious.com" type="text">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-check-osint">🔍 Trace Target</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('osint-input').value='';hideResult('osint-result')">✕ Clear</button>
+      </div>
+
+      <div class="result-panel" id="osint-result" style="margin-top:20px;">
+        <div class="result-heading">NODE INTELLIGENCE</div>
+        <div id="osint-data-wrap">
+            <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+                <span style="font-family:'Share Tech Mono'; color:var(--text3); font-size:12px;">RESOLVED IP</span>
+                <span id="osint-res-ip" style="color:var(--neon); font-family:'Orbitron';">--</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+                <span style="font-family:'Share Tech Mono'; color:var(--text3); font-size:12px;">LOCATION</span>
+                <span id="osint-res-loc" style="color:var(--text2); font-family:'Rajdhani', sans-serif; font-weight:bold;">--</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+                <span style="font-family:'Share Tech Mono'; color:var(--text3); font-size:12px;">ISP / ORG</span>
+                <span id="osint-res-isp" style="color:var(--text); font-family:'Share Tech Mono'; font-size:12px;">--</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+                <span style="font-family:'Share Tech Mono'; color:var(--text3); font-size:12px;">ASN</span>
+                <span id="osint-res-asn" style="color:var(--neon4); font-family:'Share Tech Mono'; font-size:12px;">--</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <span style="font-family:'Share Tech Mono'; color:var(--text3); font-size:12px;">COORDINATES</span>
+                <span id="osint-res-coords" style="color:var(--text2); font-family:'Share Tech Mono'; font-size:11px;">--</span>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="title-icon">📡</span> Gathering Network Logic</div>
+      <p style="font-size: 13px; color: var(--text2); line-height: 1.5; margin-bottom: 12px;">
+          This tool uses Open Source Intelligence (OSINT) to dynamically trace internet assets backward exposing their physical and organizational origin.
+      </p>
+      <ul class="suggestions-list">
+        <li>Maps physical geolocation targets of remote servers</li>
+        <li>Identifies hiding hosting providers or botnet ISPs</li>
+        <li>Bypasses simple domain masking via DNS resolution</li>
+      </ul>
+      <div class="divider"></div>
+      <div class="tip-box">
+        <strong>OSINT PRO-TIP:</strong> If a URL lookup returns an IP located in high-risk threat-actor regions unexpectedly, sever connection instantly.
       </div>
     </div>
   </div>

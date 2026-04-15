@@ -4,3 +4,5 @@ numpy==1.26.2
 Werkzeug==3.0.1
 feedparser
 requests
+Flask-SQLAlchemy
+Flask-Login

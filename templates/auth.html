@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberShield AI — Authentication</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<style>
+  body { display:flex; align-items:center; justify-content:center; }
+  .auth-card {
+    width: 400px; max-width: 90%;
+    margin: auto; padding: 30px;
+    background: linear-gradient(135deg, rgba(10,18,32,0.95), rgba(15,26,42,0.95));
+    border: 1px solid var(--neon);
+    box-shadow: var(--glow);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .auth-card::before {
+    content:''; position:absolute; top:0; left:0; width:100%; height:3px;
+    background: linear-gradient(90deg, transparent, var(--neon), transparent);
+  }
+  .auth-title {
+    text-align: center;
+    font-family: 'Orbitron'; font-size: 24px; font-weight: 700;
+    color: var(--text); margin-bottom: 20px;
+  }
+  .auth-title span { color: var(--neon); }
+  .toggle-auth {
+    text-align:center; font-family: 'Share Tech Mono'; font-size: 11px;
+    margin-top: 16px; color: var(--text2); cursor: pointer;
+  }
+  .toggle-auth:hover { color: var(--neon); text-decoration: underline; }
+  .flashes { list-style:none; margin-bottom: 15px; color: var(--neon3); font-size: 13px; text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="auth-card" id="login-box">
+  <div class="auth-title">System <span>Access</span></div>
+  
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class="flashes">
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form action="/login" method="POST">
+    <div class="input-group">
+      <label class="input-label">Username / Operator ID</label>
+      <input type="text" name="username" class="cyber-input" required autofocus>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Passphrase</label>
+      <input type="password" name="password" class="cyber-input" required>
+    </div>
+    <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">Login</button>
+  </form>
+  <div class="toggle-auth" onclick="document.getElementById('login-box').style.display='none'; document.getElementById('register-box').style.display='block';">
+    [ INITIALIZE NEW OPERATOR PROFILE ]
+  </div>
+</div>
+
+<div class="auth-card" id="register-box" style="display:none; border-color: var(--neon2); box-shadow: var(--glow2);">
+  <div class="auth-title">Operator <span>Registration</span></div>
+  <form action="/register" method="POST">
+    <div class="input-group">
+      <label class="input-label">Desired Username</label>
+      <input type="text" name="username" class="cyber-input" required>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Secure Passphrase</label>
+      <input type="password" name="password" class="cyber-input" required>
+    </div>
+    <button type="submit" class="btn btn-success" style="width:100%; margin-top:10px;">Register</button>
+  </form>
+  <div class="toggle-auth" onclick="document.getElementById('register-box').style.display='none'; document.getElementById('login-box').style.display='block';">
+    [ RETURN TO AUTHENTICATION NODE ]
+  </div>
+</div>
+
+</body>
+</html>

@@ -71,3 +71,15 @@ async function fetchNews() {
     if (!response.ok) throw new Error('API Request Failed');
     return await response.json();
 }
+
+async function fetchHistory() {
+    const response = await fetch(`${API_BASE}/history`);
+    if (!response.ok) throw new Error('API Request Failed');
+    return await response.json();
+}
+
+async function clearDbHistory() {
+    const response = await fetch(`${API_BASE}/history/clear`, { method: 'POST' });
+    if (!response.ok) throw new Error('API Request Failed');
+    return await response.json();
+}

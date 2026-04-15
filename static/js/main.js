@@ -1,5 +1,5 @@
 // ======= STATE =======
-let scanHistory = JSON.parse(localStorage.getItem('cyberHistory') || '[]');
+let scanHistory = [];
 let chatHistory = [];
 
 // ======= TABS =======
@@ -120,7 +120,7 @@ document.getElementById('btn-check-pass').addEventListener('click', async () => 
         <ul class="suggestions-list">${feedback.map(s=>`<li>${s}</li>`).join('')}</ul>
       `;
 
-      saveHistory({ type:'password', input: '•'.repeat(pw.length), result: strength, score: score });
+      await reloadHistoryData(); // Resync from DB
       
   } catch(e) {
       toast('Error analyzing password globally', 'danger');
@@ -178,7 +178,8 @@ document.getElementById('btn-check-url').addEventListener('click', async () => {
     try {
         const data = await checkUrl(raw); // From api.js
         renderURLResult(raw, data.riskScore, data.level, data.reasons);
-        saveHistory({ type:'url', input: raw, result: data.level, score: data.riskScore });
+        await reloadHistoryData(); 
+        
         if(data.level === 'Dangerous') toast('⚠️ Dangerous URL detected! Do not visit.', 'danger');
         else if(data.level === 'Suspicious') toast('Suspicious URL — proceed with caution.', 'warning');
         else toast('URL appears to be safe.', 'success');
@@ -232,7 +233,7 @@ document.getElementById('btn-check-email').addEventListener('click', async () =>
   try {
       const data = await checkEmail(text); // Hits Scikit-Learn Model in Backend
       renderEmailResult(text, data.result, data.probability, data.keywords);
-      saveHistory({ type:'email', input: text.slice(0,80)+'...', result: data.result, score: data.probability });
+      await reloadHistoryData(); 
       
       if(data.result === 'Scam') toast('Scam email detected! Do not respond or click links.', 'danger');
       else if(data.result === 'Suspicious') toast('Suspicious email detected.', 'warning');
@@ -533,14 +534,33 @@ window.renderHistory = function() {
   `;
 };
 
-window.clearHistory = function() {
-  if(!confirm('Clear all scan history?')) return;
-  scanHistory = [];
-  localStorage.removeItem('cyberHistory');
-  renderHistory();
-  updateDashboard();
-  toast('Scan history cleared.', 'info');
+window.clearHistory = async function() {
+  if(!confirm('Clear all scan history from the database?')) return;
+  try {
+      await clearDbHistory();
+      scanHistory = [];
+      renderHistory();
+      updateDashboard();
+      toast('Remote database scan history cleared.', 'info');
+  } catch (err) {
+      toast('Failed to clear remote history.', 'danger');
+  }
 };
+
+async function reloadHistoryData() {
+    try {
+        const data = await fetchHistory();
+        scanHistory = data.history;
+        if(document.getElementById('section-dashboard').classList.contains('active')) {
+            updateDashboard();
+        }
+        if(document.getElementById('section-history').classList.contains('active')) {
+            renderHistory();
+        }
+    } catch(err) {
+        console.error("Failed to fetch history API");
+    }
+}
 
 // ======= EXPORT REPORT =======
 window.exportReport = function() {
@@ -576,7 +596,8 @@ ${'='.repeat(50)}
 };
 
 // ======= INIT =======
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await reloadHistoryData();
     updateDashboard();
     loadNewsFeed();
 });

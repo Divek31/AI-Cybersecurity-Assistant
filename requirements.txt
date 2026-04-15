@@ -6,3 +6,5 @@ feedparser
 requests
 Flask-SQLAlchemy
 Flask-Login
+google-generativeai
+python-dotenv

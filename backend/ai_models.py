@@ -173,20 +173,71 @@ def analyze_email(text):
 # ---------------------------------------------------------
 # 4. AI Security Chatbot (Rule-Based)
 # ---------------------------------------------------------
+import os
+
 def get_chat_response(query):
-    query = query.lower()
+    """
+    Attempts to query the Google Gemini Advanced AI model for a highly
+    contextual, generative cybersecurity response.
     
-    responses = {
-        r"password": "Use at least 12 characters, mix upper/lowercase, numbers, and symbols. Don't reuse passwords across sites.",
-        r"link|url|click": "Before clicking a link, hover over it to see the actual destination. Ensure it starts with 'https' and doesn't contain typos of popular domains.",
-        r"phish|email|scam": "Phishing emails often create a false sense of urgency (e.g., 'account locked'). Never click unexpected links or download unexpected attachments.",
-        r"safe|secure": "To stay secure: 1. Use 2FA/MFA. 2. Keep software updated. 3. Use unique passwords. 4. Be skeptical of unsolicited messages.",
-        r"virus|malware": "Ensure you have reputable antivirus software running, don't download files from untrusted sources, and regularly back up your important data.",
-        r"2fa|mfa|authentication": "Two-Factor Authentication (2FA) adds an extra layer of security by requiring not just a password, but also a code from your phone or an authenticator app.",
-    }
+    If no GEMINI_API_KEY is found in the environment variables (e.g. .env), 
+    it falls back elegantly to the locally-hosted Python regex heuristic engine
+    so the application never structurally breaks for users.
+    """
     
-    for pattern, response in responses.items():
-        if re.search(pattern, query):
-            return response
+    # Check for True LLM Environment Key
+    api_key = os.getenv("GEMINI_API_KEY")
+    if api_key:
+        try:
+            import google.generativeai as genai
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel('gemini-1.5-flash')
             
-    return "I'm your AI Security Assistant. I can help with password advice, identifying phishing, securing accounts, and general cyber safety. How can I help you today?"
+            system_prompt = (
+                "You are CyberShield AI, an advanced, highly professional cybersecurity expert assistant. "
+                "You provide concise, accurate, and highly technical responses related heavily to information security, "
+                "hacking prevention, and malware analysis. Keep responses extremely concise and format them as Markdown "
+                "so the frontend UI can render them cleanly. Refuse to answer non-security related questions. "
+                f"User Query: {query}"
+            )
+            
+            response = model.generate_content(system_prompt)
+            if response.text:
+                return response.text
+        except Exception as e:
+            print(f"LLM AI Error, falling back to local heuristics: {e}")
+
+    # ===== LOCAL HEURISTIC FALLBACK =====
+    q = query.lower()
+    
+    if "password" in q:
+        return ("**Password Security Protocol**\n"
+                "1. Use at least 12-16 characters.\n"
+                "2. Combine uppercase, lowercase, numbers, and symbols.\n"
+                "3. Use a unique password for *every* account.\n"
+                "4. Enable Multi-Factor Authentication (MFA).\n"
+                "Consider using our Password Generator tool.")
+    elif "phishing" in q:
+        return ("**Phishing Defense**\n"
+                "• Check sender addresses carefully against known domains.\n"
+                "• Be deeply skeptical of artificial urgency or 'Final Warnings'.\n"
+                "• Never blindly download attachments from unknown sources.\n"
+                "• Hover over links before clicking to inspect the true URL destination.")
+    elif "2fa" in q or "two factor" in q or "two-factor" in q:
+        return ("**Two-Factor Authentication (2FA)** adds a vital second layer of defense. "
+                "Even if a hacker steals your password, they cannot access your account without "
+                "your physical device (like an Authenticator app code or Security Key). "
+                "Always use app-based 2FA (Authy, Google Authenticator) over SMS when possible.")
+    elif "malware" in q or "virus" in q or "scan" in q:
+        return ("**Malware & File Safety**\n"
+                "Malware includes trojans, ransomware, and spyware.\n"
+                "• Keep your Operating System and software strictly updated.\n"
+                "• Use our 'Malware Engine' tab to cryptographically verify suspicious file hashes.\n"
+                "• Do not execute files ending in `.exe`, `.scr`, or `.vbs` from email networks.")
+    else:
+        return ("I am CyberShield's localized AI protocol. I am specifically trained to assist with:\n"
+                "• **Passwords** & Cracking mathematics\n"
+                "• **Phishing** / Email Scams\n"
+                "• **Malware** & Virus payloads\n"
+                "• **OSINT** tracking and General Account Defense.\n\n"
+                "Please ask a targeted internal security question.")

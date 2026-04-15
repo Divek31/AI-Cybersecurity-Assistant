@@ -8,6 +8,9 @@ from backend.breach_scanner import check_email_breach
 from backend.osint_scanner import analyze_ip_domain
 from backend.malware_scanner import analyze_file_hash
 from backend.models import db, User, ScanHistory
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = 'cyber_shield_ultra_secret_key_change_me_in_production'

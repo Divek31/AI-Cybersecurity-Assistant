@@ -103,6 +103,22 @@
     </div>
   </div>
 
+  <div class="card" style="margin-top:16px; background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), rgba(0, 255, 157, 0.05)); border-color: rgba(0, 212, 255, 0.3);">
+    <div class="card-title" style="margin-bottom:10px;"><span class="title-icon">🛡️</span> Global Security Profile</div>
+    <div style="display:flex; align-items:center; gap: 20px;">
+        <div style="flex:1;">
+            <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+                <span style="font-family:'Share Tech Mono'; font-size:12px; color:var(--text2);">Overall Protocol Safety</span>
+                <span id="global-score-text" style="font-family:'Orbitron'; font-weight:bold; color:var(--neon2);">100/100</span>
+            </div>
+            <div class="strength-bar-bg" style="height: 12px;">
+                <div class="strength-bar-fill" id="global-score-bar" style="width:100%; background: linear-gradient(90deg, #007744, #00ff9d);"></div>
+            </div>
+            <div id="global-score-msg" style="margin-top:8px; font-size: 12px; color:var(--text3);">Excellent! Your recent scans show strong security habits.</div>
+        </div>
+    </div>
+  </div>
+
   <div class="card" style="margin-top:16px;">
     <div class="card-title"><span class="title-icon">🔔</span> Recent Alerts</div>
     <div id="recent-alerts">
@@ -144,6 +160,10 @@
         <div style="margin-top:10px;display:flex;align-items:center;gap:12px">
           <span class="strength-badge" id="pw-badge" style="background:rgba(58,90,120,0.2);color:var(--text3);border:1px solid var(--text3)">NOT ANALYZED</span>
           <span id="pw-score-text" style="font-family:'Share Tech Mono';font-size:11px;color:var(--text3)"></span>
+          <div style="margin-left: auto; font-family:'Share Tech Mono'; font-size: 11px; color:var(--neon2); display:none;" id="pw-crack-wrap">
+              <span style="color:var(--text3);">Est. Crack Time: </span>
+              <span id="pw-crack-time" style="font-weight:bold;"></span>
+          </div>
         </div>
       </div>
 
@@ -163,8 +183,22 @@
 
       <div class="divider"></div>
       <div class="card-title" style="font-size:11px"><span class="title-icon">⚙️</span> Generate Strong Password</div>
+      
+      <div style="margin-top: 10px; font-family:'Share Tech Mono'; font-size: 12px;">
+         <div style="display:flex; justify-content:space-between; margin-bottom: 6px;">
+            <label style="color:var(--text2);">Length: <span id="gen-len-disp" style="color:var(--neon);">16</span></label>
+            <input type="range" id="gen-len" min="8" max="32" value="16" style="width:60%; cursor:pointer;" oninput="document.getElementById('gen-len-disp').textContent = this.value">
+         </div>
+         <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; color:var(--text2); margin-bottom: 12px;">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="gen-upper" checked> Uppercase (A-Z)</label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="gen-lower" checked> Lowercase (a-z)</label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="gen-num" checked> Numbers (0-9)</label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="gen-sym" checked> Symbols (!@#$)</label>
+         </div>
+      </div>
+
       <div class="pass-gen-row">
-        <div class="pass-gen-output" id="gen-pw-output">Click Generate →</div>
+        <div class="pass-gen-output" id="gen-pw-output" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Click Generate →</div>
         <button class="btn btn-success btn-sm" onclick="generatePassword()">Generate</button>
         <button class="btn btn-ghost btn-sm" onclick="copyGenerated()" title="Copy">📋</button>
       </div>

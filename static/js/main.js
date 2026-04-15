@@ -83,7 +83,7 @@ document.getElementById('btn-check-pass').addEventListener('click', async () => 
   showLoading('pw-loading');
   try {
       const data = await checkPassword(pw);  // From api.js calling backend
-      const { score, strength, feedback } = data;
+      const { score, strength, feedback, crack_time } = data;
       
       const bar = document.getElementById('pw-bar');
       const badge = document.getElementById('pw-badge');
@@ -91,6 +91,11 @@ document.getElementById('btn-check-pass').addEventListener('click', async () => 
 
       bar.style.width = score + '%';
       scoreText.textContent = `Score: ${score}/100`;
+
+      const crackWrap = document.getElementById('pw-crack-wrap');
+      const crackText = document.getElementById('pw-crack-time');
+      crackWrap.style.display = 'block';
+      crackText.textContent = crack_time;
 
       if(strength === 'Weak') {
         bar.style.background = 'linear-gradient(90deg, #cc1144, #ff3e6c)';
@@ -125,13 +130,34 @@ document.getElementById('btn-check-pass').addEventListener('click', async () => 
 });
 
 window.generatePassword = function() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*()-_=+';
+  const len = parseInt(document.getElementById('gen-len').value) || 16;
+  const useUpper = document.getElementById('gen-upper').checked;
+  const useLower = document.getElementById('gen-lower').checked;
+  const useNum = document.getElementById('gen-num').checked;
+  const useSym = document.getElementById('gen-sym').checked;
+
+  if (!useUpper && !useLower && !useNum && !useSym) {
+      toast('Please select at least one character type!', 'warning');
+      return;
+  }
+
+  let chars = '';
+  if (useUpper) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if (useLower) chars += 'abcdefghijklmnopqrstuvwxyz';
+  if (useNum) chars += '0123456789';
+  if (useSym) chars += '!@#$%^&*()-_=+';
+
   let pw = '';
-  pw += 'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random()*24)];
-  pw += 'abcdefghijkmnopqrstuvwxyz'[Math.floor(Math.random()*23)];
-  pw += '23456789'[Math.floor(Math.random()*8)];
-  pw += '!@#$%^&*'[Math.floor(Math.random()*8)];
-  for(let i = 0; i < 12; i++) pw += chars[Math.floor(Math.random()*chars.length)];
+  // Ensure at least one of each selected type
+  if (useUpper) pw += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random()*26)];
+  if (useLower) pw += 'abcdefghijklmnopqrstuvwxyz'[Math.floor(Math.random()*26)];
+  if (useNum) pw += '0123456789'[Math.floor(Math.random()*10)];
+  if (useSym) pw += '!@#$%^&*()-_=+'[Math.floor(Math.random()*14)];
+  
+  while (pw.length < len) {
+      pw += chars[Math.floor(Math.random()*chars.length)];
+  }
+  
   pw = pw.split('').sort(()=>Math.random()-0.5).join('');
   document.getElementById('gen-pw-output').textContent = pw;
   toast('Strong password generated!', 'success', 2000);
@@ -340,6 +366,39 @@ function updateDashboard() {
   animateCount('stat-threats', threats);
   animateCount('stat-safe', safe);
   animateCount('stat-pwchecks', pwChecks);
+
+  // Global Score Logic
+  let globalScore = 100;
+  if (total > 0) {
+      // Base score is safely percentage of scans
+      const safeRatio = safe / total;
+      globalScore = Math.round(safeRatio * 100);
+      
+      // Heavily penalize recent absolute threats
+      const recentThreats = scanHistory.slice(0, 5).filter(s => ['DANGEROUS','Dangerous','SCAM','Scam'].includes(s.result)).length;
+      globalScore = Math.max(0, globalScore - (recentThreats * 15));
+  }
+  
+  const scoreText = document.getElementById('global-score-text');
+  const scoreBar = document.getElementById('global-score-bar');
+  const scoreMsg = document.getElementById('global-score-msg');
+  
+  scoreText.textContent = `${globalScore}/100`;
+  scoreBar.style.width = `${globalScore}%`;
+  
+  if (globalScore >= 80) {
+      scoreBar.style.background = 'linear-gradient(90deg, #007744, #00ff9d)';
+      scoreText.style.color = 'var(--neon2)';
+      scoreMsg.textContent = 'Excellent! Your recent scans indicate strong security habits.';
+  } else if (globalScore >= 50) {
+      scoreBar.style.background = 'linear-gradient(90deg, #aa7700, #ffb400)';
+      scoreText.style.color = 'var(--neon4)';
+      scoreMsg.textContent = 'Moderate Risk. Consider reviewing some of your flagged items.';
+  } else {
+      scoreBar.style.background = 'linear-gradient(90deg, #cc1144, #ff3e6c)';
+      scoreText.style.color = 'var(--neon3)';
+      scoreMsg.textContent = 'High Risk Profile! Multiple critical threats detected recently.';
+  }
 
   renderBarChart();
   renderPieChart();

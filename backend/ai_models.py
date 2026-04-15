@@ -46,11 +46,37 @@ def analyze_password(password):
         
     if not feedback:
         feedback.append("Great password!")
+        
+    # Calculate Pool Size for Entropy
+    pool_size = 0
+    if re.search(r"[a-z]", password): pool_size += 26
+    if re.search(r"[A-Z]", password): pool_size += 26
+    if re.search(r"[0-9]", password): pool_size += 10
+    if re.search(r"[^A-Za-z0-9]", password): pool_size += 32
+    
+    import math
+    entropy = len(password) * math.log2(pool_size) if pool_size > 0 else 0
+    
+    # Assume a hash rate of 10 billion guesses per second
+    guesses_per_second = 10_000_000_000
+    crack_time_seconds = (2 ** entropy) / guesses_per_second if entropy > 0 else 0
+    
+    def format_time(seconds):
+        if seconds < 1: return "Instantly"
+        if seconds < 60: return "A few seconds"
+        if seconds < 3600: return f"{int(seconds // 60)} minutes"
+        if seconds < 86400: return f"{int(seconds // 3600)} hours"
+        if seconds < 31536000: return f"{int(seconds // 86400)} days"
+        if seconds < 3153600000: return f"{int(seconds // 31536000)} years"
+        return "> 100 years"
+
+    crack_time_str = format_time(crack_time_seconds)
 
     return {
         "score": score,
         "strength": strength,
-        "feedback": feedback
+        "feedback": feedback,
+        "crack_time": crack_time_str
     }
 
 # ---------------------------------------------------------
